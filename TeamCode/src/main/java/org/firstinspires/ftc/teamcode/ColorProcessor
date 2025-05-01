@@ -1,0 +1,101 @@
+
+package org.firstinspires.ftc.teamcode;
+
+import android.graphics.Canvas;
+import android.graphics.Rect;
+
+import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
+import org.firstinspires.ftc.vision.VisionProcessor;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
+
+public class ColorProcessor implements VisionProcessor{
+    Rect bottomHalf;
+
+
+    Mat hsvMat = new Mat();
+    Mat lowMat = new Mat();
+    Mat highMat = new Mat();
+    Mat MatB = new Mat();
+    Mat detectedMat = new Mat();
+
+//low range for red
+    Scalar lowerRedThresholdLow= new Scalar(0, 125, 125);
+    Scalar lowerRedThresholdHigh = new Scalar(10,255,255);
+
+//high range for red
+    Scalar upperRedThresholdLow = new Scalar(165, 125, 125);
+    Scalar upperRedThresholdHigh = new Scalar(180, 255, 255);
+
+    // Blue ranges
+    Scalar lowerBlueThreshold = new Scalar(100, 125, 125);
+    Scalar upperBlueThreshold = new Scalar(125, 255, 255);
+
+
+
+    public int colorNum = 0;
+
+    Color color = Color.UNDETECTED;
+
+
+
+
+    @Override
+    public void init(int width, int height, CameraCalibration calibration) {
+        //CREATING THE VISION FRAME THE COLOR PROCESSOR WILL BE USING
+        //Only using bottom half of frame under the assumption that the color will be on the ground
+    bottomHalf = new Rect(
+            0, height/2, width, height
+    );
+
+    }
+
+    @Override
+    public Object processFrame(Mat frame, long captureTimeNanos) {
+        //changes rgb frame to hsv and assigns that value to hsvMat
+        Imgproc.cvtColor(frame, hsvMat, Imgproc.COLOR_RGB2HSV);
+        Core.inRange(hsvMat,lowerRedThresholdLow, lowerRedThresholdHigh, lowMat);
+        Core.inRange(hsvMat,upperRedThresholdLow, upperRedThresholdHigh, highMat);
+
+        //the same for blue
+        Core.inRange(hsvMat,lowerBlueThreshold,upperBlueThreshold, MatB);
+
+        //Combines detections from both red ranges into a single detectedMat
+        Core.bitwise_or(lowMat, highMat, detectedMat);
+
+        //how many pixels in specified area are white
+        double framePercentRed = Core.sumElems(detectedMat).val[0]/255;
+        double framePercentBlue = Core.sumElems(MatB).val[0]/255;
+
+        if(framePercentRed > framePercentBlue){
+            color = color.RED;
+        } else if (framePercentBlue > framePercentRed) {
+            color = color.BLUE;
+        }
+        return null;
+    }
+
+    @Override
+    public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
+
+        }
+
+
+    public Color getColor(){
+        return color;
+    }
+    public enum Color {
+        RED(1),
+        BLUE(2),
+        UNDETECTED(0);
+
+        public final int colorNum;
+
+        public Color(int colorNum) {
+            this.colorNum = colorNum;
+        }
+    }
+
+}
