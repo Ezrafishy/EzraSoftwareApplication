@@ -1,0 +1,175 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.hardware.DcMotor;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+public class MovementE {
+    public static double rotations;
+
+    //RUN FUNCTIONS
+    public static void forward (double distance, Telemetry telemetry, DcMotor FL, DcMotor FR, DcMotor BL, DcMotor BR){
+        reset_encoders(FL,FR,BL,BR);
+        brakemode(FL,FR,BL,BR);
+        rotations = distance * 21.74;
+        //21.74 is what turns CM into rotations (Haruka calculated it in the 2023-2024 season)
+
+        //SET TARGET POSITION
+        FL.setTargetPosition((int)rotations);
+        FR.setTargetPosition((int)rotations);
+        BL.setTargetPosition((int)rotations);
+        BR.setTargetPosition((int)rotations);
+        //MOVE TO POSITION
+       FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+       FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+       BL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+       BR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+       //POWER
+        FL.setPower(.5);
+        FR.setPower(.5);
+        BL.setPower(.5);
+        BR.setPower(.5);
+
+        while(FL.isBusy() && FR.isBusy() && BL.isBusy() && BR.isBusy()){
+            wheel_telemetry(telemetry,FL,FR,BL,BR);
+        }
+        stop_motors(FL,FR,BL,BR);
+    }
+
+    public static void backward (double distance, Telemetry telemetry, DcMotor FL, DcMotor FR, DcMotor BL, DcMotor BR){
+        reset_encoders(FL,FR,BL,BR);
+        brakemode(FL,FR,BL,BR);
+        rotations = distance * 21.74;
+
+        //SET TARGET POSITION
+        FL.setTargetPosition((int)-rotations); //setting rotations to negative makes the wheels rotate backwards
+        FR.setTargetPosition((int)-rotations);
+        BL.setTargetPosition((int)-rotations);
+        BR.setTargetPosition((int)-rotations);
+        //MOVE TO POSITION
+        FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        BL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        BR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //POWER
+        FL.setPower(.5);
+        FR.setPower(.5);
+        BL.setPower(.5);
+        BR.setPower(.5);
+
+        while(FL.isBusy() && FR.isBusy() && BL.isBusy() && BR.isBusy()){
+            telemetry.update();
+            wheel_telemetry(telemetry,FL,FR,BL,BR);
+        }
+        stop_motors(FL,FR,BL,BR);
+    }
+
+    public static void left (double distance, Telemetry telemetry, DcMotor FL, DcMotor FR, DcMotor BL, DcMotor BR){
+        reset_encoders(FL,FR,BL,BR);
+        brakemode(FL,FR,BL,BR);
+        rotations = distance * 21.74;
+
+        //SET TARGET POSITION
+        FL.setTargetPosition((int)-rotations); //setting FL and BR negative makes it strafe left
+        FR.setTargetPosition((int)rotations);
+        BL.setTargetPosition((int)rotations);
+        BR.setTargetPosition((int)-rotations);
+        //MOVE TO POSITION
+        FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        BL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        BR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //POWER
+        FL.setPower(.5);
+        FR.setPower(.5);
+        BL.setPower(.5);
+        BR.setPower(.5);
+
+        while(FL.isBusy() && FR.isBusy() && BL.isBusy() && BR.isBusy()){
+            telemetry.update();
+            wheel_telemetry(telemetry,FL,FR,BL,BR);
+        }
+        stop_motors(FL,FR,BL,BR);
+    }
+
+    public static void right (double distance, Telemetry telemetry, DcMotor FL, DcMotor FR, DcMotor BL, DcMotor BR){
+        reset_encoders(FL,FR,BL,BR);
+        brakemode(FL,FR,BL,BR);
+        rotations = distance * 21.74;
+
+        //SET TARGET POSITION
+        FL.setTargetPosition((int)rotations); //setting FR and BL negative makes it strafe right
+        FR.setTargetPosition((int)-rotations);
+        BL.setTargetPosition((int)-rotations);
+        BR.setTargetPosition((int)rotations);
+        //MOVE TO POSITION
+        FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        BL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        BR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //POWER
+        FL.setPower(.5);
+        FR.setPower(.5);
+        BL.setPower(.5);
+        BR.setPower(.5);
+
+        while(FL.isBusy() && FR.isBusy() && BL.isBusy() && BR.isBusy()){
+            telemetry.update();
+            wheel_telemetry(telemetry,FL,FR,BL,BR);
+        }
+        stop_motors(FL,FR,BL,BR);
+    }
+    public static void raise_flag (Servo flag){
+        flag.setPosition(1);
+    }
+
+
+
+    //Smaller functions to keep code decluttered
+
+    //RESETS ENCODERS
+    public static void reset_encoders (DcMotor FL, DcMotor FR, DcMotor BL, DcMotor BR){
+        FL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        FR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        BL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        BR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        FL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        FR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        BL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        BR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+    //STOPS MOTORS
+    public static void stop_motors(DcMotor FL, DcMotor FR, DcMotor BL, DcMotor BR){
+        FL.setPower(0);
+        FR.setPower(0);
+        BL.setPower(0);
+        BR.setPower(0);
+    }
+
+    //PREVENTS DRIFT
+    public static void brakemode(DcMotor FL, DcMotor FR, DcMotor BL, DcMotor BR){
+        FL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        FR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        BL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        BR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+
+    //ALLOWS US TO VIEW TELEMETRY
+    public static void wheel_telemetry (Telemetry telemetry, DcMotor FL, DcMotor FR, DcMotor BL, DcMotor BR){
+        telemetry.addData("FL pos: ", FL.getCurrentPosition());
+        telemetry.addData("FR pos: ", FR.getCurrentPosition());
+        telemetry.addData("BL pos: ", BL.getCurrentPosition());
+        telemetry.addData("BR pos: ", BR.getCurrentPosition());
+        telemetry.update();
+
+    }
+
+    //SETS THE WHEEL DIRECTION FOR MECANUM WHEELS
+    public static void setWheelDirection(DcMotor FL, DcMotor FR, DcMotor BL, DcMotor BR){
+        FL.setDirection(DcMotor.Direction.REVERSE);
+        FR.setDirection(DcMotor.Direction.FORWARD);
+        BL.setDirection(DcMotor.Direction.REVERSE);
+        BR.setDirection(DcMotor.Direction.FORWARD);
+    }
+}
