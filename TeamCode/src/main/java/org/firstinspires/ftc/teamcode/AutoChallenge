@@ -1,0 +1,90 @@
+package org.firstinspires.ftc.teamcode;
+
+import android.util.Size;
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
+import org.firstinspires.ftc.vision.VisionPortal;
+
+import java.util.concurrent.Flow;
+
+
+@Autonomous(name = "AutoChallenge")
+public class AutoChallenge extends LinearOpMode {
+    //SET UP MOTORS
+    DcMotor FL;
+    DcMotor FR;
+    DcMotor BL;
+    DcMotor BR;
+    Servo flag;
+
+
+//Vision sensor set up
+    ColorProcessor processor;
+    VisionPortal portal;
+
+
+
+    @Override
+    public void runOpMode(){
+        //CONFIGURING AND SETTING UP MOTORS
+        FL = hardwareMap.get(DcMotor.class, "FL");
+        FR = hardwareMap.get(DcMotor.class, "FR");
+        BL = hardwareMap.get(DcMotor.class, "BL");
+        BR = hardwareMap.get(DcMotor.class, "BR");
+        //flag = hardwareMap.get(Servo.class, "flag");
+
+        MovementE.setWheelDirection(FL, FR, BL, BR);
+
+        //SETTING UP VISION PROCESSOR
+        processor = new ColorProcessor();
+        portal = new VisionPortal.Builder()
+                .setCamera(hardwareMap.get(CameraName.class, "Webcam1"))
+                .setCameraResolution(new Size(640,480))
+                .addProcessors(processor)
+                .build();
+
+
+        telemetry.addLine("Press Start...");
+        telemetry.update();
+        waitForStart();
+
+        ColorProcessor.Color color = processor.getColor();
+if(color == ColorProcessor.Color.RED){
+    telemetry.addLine("RED");
+}
+else if(color == ColorProcessor.Color.BLUE){
+    telemetry.addLine("BLUE");
+}
+else{
+    telemetry.addLine("NO COLOR DETECTED");
+}
+        if(color == ColorProcessor.Color.RED){
+            MovementE.forward(61,telemetry, FL, FR, BL, BR);
+            MovementE.left(20, telemetry, FL, FR, BL, BR);
+            MovementE.forward(20, telemetry, FL, FR, BL, BR);
+            MovementE.right(20, telemetry, FL, FR, BL, BR);
+            MovementE.backward(20, telemetry, FL, FR, BL, BR);
+            MovementE.left(20, telemetry, FL, FR, BL, BR); //completes full rotation
+            MovementE.forward(20, telemetry, FL, FR, BL, BR);// parks in box
+
+    } else if(color == ColorProcessor.Color.BLUE) {
+            MovementE.forward(61,telemetry, FL, FR, BL, BR);
+            MovementE.right(20.25, telemetry, FL, FR, BL, BR);
+            MovementE.forward(20.5, telemetry, FL, FR, BL, BR);
+            MovementE.left(20.5, telemetry, FL, FR, BL, BR);
+            MovementE.backward(20.5, telemetry, FL, FR, BL, BR);
+            MovementE.right(20.25, telemetry, FL, FR, BL, BR); //completes full rotation
+            MovementE.left(20.25, telemetry, FL, FR, BL, BR);
+            MovementE.forward(20.25, telemetry, FL, FR, BL, BR); //parks in box
+            MovementE.raise_flag(flag);
+        }
+
+
+    }
+}
